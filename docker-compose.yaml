@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      - MYSQL_HOST
+      - MYSQL_PORT
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DBNAME
+    ports:
+      - 3306:3306
+    volumes:
+      - contact-manager-mysql-data:/var/lib/mysql
+      - contact-manager-mysql-config:/etc/mysql
+  node_backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      MYSQL_DBNAME: ${MYSQL_DBNAME}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_HOST: db
+    volumes:
+      - ./:/nodejs_hello
+    ports:
+      - "3030:3030"
+    depends_on:
+      - db
+
+volumes:
+  contact-manager-mysql-data:
+  contact-manager-mysql-config:
